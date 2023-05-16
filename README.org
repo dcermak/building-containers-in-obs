@@ -1,0 +1,18 @@
+* Everything that you never wanted to know about building containers in OBS
+
+This repository contains the slides for the presentation "Everything that you never wanted to know about building containers in OBS" held at the openSUSE Conference 2023.
+
+You can find the rendered slides here: [[https://dcermak.github.io/building-containers-in-obs/building-containers-in-obs.html][dcermak.github.io/building-containers-in-obs]].
+
+
+** Building the slides
+
+You can create the html slides yourself from within Emacs by opening the
+[[./building-containers-in-obs.org]] file, launching =org-mode= and executing ~(require
+'ox-reveal)~ (you might have to install =ox-reveal= beforehand). Then export the
+org file to reveal.js (this is by default bound to the keychord =C-c C-e R R=).
+
+If you are not a Emacs user, then just install Emacs and execute:
+#+begin_src bash
+emacs building-containers-in-obs.org -Q --batch -l export-init.el -f org-reveal-export-to-html --kill
+#+end_src

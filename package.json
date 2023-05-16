@@ -1,0 +1,11 @@
+{
+  "name": "building-containers-in-obs",
+  "version": "0.0.1",
+  "description": "Slides for the presentation Everything that you never wanted to know about building containers in OBS",
+  "author": "Dan Čermák <dcermak@suse.com>",
+  "license": "CC-BY-SA-4.0",
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^6.4",
+    "reveal.js": "^4.5"
+  }
+}

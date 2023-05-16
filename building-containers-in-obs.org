@@ -1,0 +1,277 @@
+# -*- org-confirm-babel-evaluate: nil; -*-
+#+AUTHOR: Dan Čermák
+#+DATE: May 16, 2023
+#+EMAIL: dcermak@suse.com
+#+TITLE: Everything that you never wanted to know about building Containers in OBS
+# #+SUBTITLE: Testing Container Images with Python and Pytest
+
+#+REVEAL_ROOT: ./node_modules/reveal.js/
+#+REVEAL_THEME: simple
+#+REVEAL_PLUGINS: (highlight notes history)
+#+OPTIONS: toc:nil
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+REVEAL_INIT_OPTIONS: transition: 'none', hash: true
+#+OPTIONS: num:nil toc:nil center:nil reveal_title_slide:nil
+#+REVEAL_EXTRA_CSS: ./node_modules/@fortawesome/fontawesome-free/css/all.min.css
+#+REVEAL_EXTRA_CSS: ./custom-style.css
+#+REVEAL_HIGHLIGHT_CSS: ./node_modules/reveal.js/plugin/highlight/zenburn.css
+
+#+REVEAL_TITLE_SLIDE: <h2 class="title">%t</h2>
+#+REVEAL_TITLE_SLIDE: <p class="subtitle" style="color: Gray;">%s</p>
+#+REVEAL_TITLE_SLIDE: <p class="author">%a</p>
+#+REVEAL_TITLE_SLIDE: <div style="float:left"><a href="https://events.opensuse.org/conferences/oSC23/" target="_blank"><img src="./media/oSC_city_design.svg" height="50px"/></a></div>
+#+REVEAL_TITLE_SLIDE: <div style="float:right;font-size:35px;"><p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#"><a href="https://creativecommons.org/licenses/by/4.0" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">
+#+REVEAL_TITLE_SLIDE: CC BY 4.0 <i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></a></p></div>
+
+* agenda
+
+  - [[agenda][agenda]]
+  - [[who -u][who -u]]
+  - [[So you want to build containers?][So you want to build containers?]]
+  - [[Available Tools][Available Tools]]
+    - [[When to use which?][When to use which?]]
+    - [[When not to use OBS][When not to use OBS]]
+  - [[Minimal Docker Example][Minimal Docker Example]]
+    - [[repository setup][repository setup]]
+    - [[=prjconf=][=prjconf=]]
+    - [[=Dockerfile= peculiarities][=Dockerfile= peculiarities]]
+  - [[Kiwi example][Kiwi example]]
+  - [[Multi-Arch][Multi-Arch]]
+  - [[tagging images][tagging images]]
+  - [[building against a registry][building against a registry]]
+  - [[keeping multiple versions around][keeping multiple versions around]]
+  - [[build arguments][build arguments]]
+  - [[Helper services][Helper services]]
+  - [[=obs-service-replace_using_package_version=][=obs-service-replace_using_package_version=]]
+  - [[=metainfo_helper=][=metainfo_helper=]]
+  - [[Labels][Labels]]
+  - [[Questions?][Questions?]]
+
+* who -u
+
+Dan Čermák
+
+@@html: <div style="float:center">@@
+@@html: <table class="who-table">@@
+@@html: <tr><td><i class="fab fa-suse"></i></td><td> Software Developer @SUSE</td></tr>@@
+# @@html: <tr><td><i class="fab fa-fedora"></i></td><td> i3 SIG, Package maintainer</td></tr>@@
+@@html: <tr><td><i class="far fa-heart"></i></td><td> Developer Tools, Testing and Documentation, Home Automation</td></tr>@@
+@@html: <tr></tr>@@
+@@html: <tr></tr>@@
+@@html: <tr><td><i class="fa-solid fa-globe"></i></td><td> <a href="https://dancermak.name/">https://dancermak.name</a></td></tr>@@
+@@html: <tr><td><i class="fab fa-github"></i></td><td> <a href="https://github.com/dcermak/">dcermak</a></td></tr>@@
+@@html: <tr><td><i class="fab fa-mastodon"></i></td><td> <a href="https://mastodon.social/@Defolos">@Defolos@mastodon.social</a></td></tr>@@
+@@html: </table>@@
+@@html: </div>@@
+
+* So you want to build containers?
+
+Why use OBS?
+
+#+ATTR_REVEAL: :frag (appear)
+- automated rebuilds
+- automatic publishing
+- create tiny images without (horrible) hacks
+
+* Available Tools
+
+1. Docker & Podman
+2. [[https://github.com/OSInside/kiwi][Kiwi]]
+
+** When to use which?
+
+#+ATTR_REVEAL: :frag (appear)
+- whatever you are familiar with
+- @@html:<i class="fa-solid fa-minimize"></i>@@ tiny image? \rar =kiwi=, else =docker/podman=
+
+
+** When not to use OBS
+
+#+ATTR_REVEAL: :frag (appear)
+- not using =zypper= / =dnf=
+- complex =Dockerfile=, pulling many binaries
+- require previous releases to be available
+
+
+* Minimal Docker Example
+
+** repository setup
+
+#+begin_src xml
+  <repository name="standard">
+    <path project="openSUSE:Factory" repository="images"/>
+    <path project="openSUSE:Factory:ARM" repository="images"/>
+    <path project="openSUSE:Factory:ARM" repository="standard"/>
+    <path project="openSUSE:Factory:PowerPC" repository="standard"/>
+    <path project="openSUSE:Factory:zSystems" repository="standard"/>
+    <path project="openSUSE:Factory" repository="snapshot"/>
+    <arch>x86_64</arch>
+    <arch>aarch64</arch>
+    <arch>s390x</arch>
+    <arch>ppc64le</arch>
+  </repository>
+  <!-- snip -->
+  <repository name="containerfile">
+    <path project="$THIS_PROJECT" repository="images"/>
+    <path project="$THIS_PROJECT" repository="standard"/>
+    <arch>x86_64</arch>
+    <arch>aarch64</arch>
+    <arch>s390x</arch>
+    <arch>ppc64le</arch>
+  </repository>
+</repository>
+#+end_src
+
+** =prjconf=
+
+#+begin_src
+%if %_repository == "containerfile"
+Type: docker
+# optional:
+BuildEngine: podman
+%endif
+#+end_src
+
+** =Dockerfile= peculiarities
+
+- *no* network access
+- all zypper/dnf calls must be in =Dockerfile=
+
+* Kiwi example
+
+- how to use the from line (=#= instead of =:=)
+#+begin_src xml
+  <preferences>
+    <type image="docker" derived_from="obsrepositories:/suse/sle15#15.3">
+      <containerconfig
+          name="bci/ruby"
+          tag="2.5"
+          maintainer="SUSE LLC (https://www.suse.com/)"
+          additionaltags="2.5-%RELEASE%,2,2-%RELEASE%">
+      </containerconfig>
+    </type>
+    <version>15.3.0</version>
+  </preferences>
+#+end_src
+
+
+* Multi-Arch
+
+
+- =#!ArchExclusiveLine= / =#!ArchExcludedLine=
+- =#!ExclusiveArch= / =#!ExcludeArch=
+
+
+* tagging images
+
+i.e. ~docker build -t my/prefix:1.5 -t my/prefix:latest .~
+
+=Dockerfile=:
+#+begin_src Dockerfile
+#!BuildTag: my/prefix:1.5
+#!BuildTag: my/prefix:latest
+#+end_src
+
+#+REVEAL: split
+kiwi xml:
+#+begin_src xml
+<!-- OBS-AddTag: my/prefix:1.5 my/prefix:latest -->
+#+end_src
+
+
+* building against a registry
+
+- create the registry as a =dod= project/repository (e.g. [[https://build.opensuse.org/project/show/SUSE:Registry][=SUSE:Registry=]]):
+#+begin_src xml
+  <publish>
+    <disable/>
+  </publish>
+  <repository name="standard">
+    <download arch="x86_64" url="https://registry.suse.com" repotype="registry"/>
+    <download arch="aarch64" url="https://registry.suse.com" repotype="registry"/>
+    <arch>x86_64</arch>
+    <arch>aarch64</arch>
+  </repository>
+#+end_src
+
+- Add it to your project =_meta=:
+#+begin_src xml
+<repository name="standard">
+  <!-- replace with the appropriate project name -->
+  <path project="SUSE:Registry" repository="standard"/>
+  <!-- additional paths -->
+  <arch>x86_64</arch>
+  <arch>aarch64</arch>
+</repository>
+#+end_src
+
+
+* keeping multiple versions around
+
+* build arguments
+
+* Helper services
+
+~curl -f https://path/to/binary.tar.gz -o binary.tar.gz~
+
+#+begin_src Dockerfile
+#!RemoteAssetUrl https://path/to/binary.tar.gz
+COPY binary.tar.gz .
+#+end_src
+
+or
+#+begin_src xml
+<!-- OBS-RemoteAsset: https://path/to/binary.tar.gz -->
+#+end_src
+
+
+
+* =obs-service-replace_using_package_version=
+
+@@html: https://github.com/openSUSE/obs-service-replace_using_package_version@@
+
+
+* =metainfo_helper=
+
+
+* Labels
+
+#+ATTR_REVEAL: :frag (appear)
+- key-value metadata for a container image
+- pre-defined keys: [[https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys][=org.opencontainers.image.**=]]
+- openSUSE [[https://en.opensuse.org/Building_derived_containers#Labels][label rules]]
+- labels of the base image get overwritten
+
+
+#+REVEAL: split
+
+preserve =LABEL= them using [[https://build.opensuse.org/package/view_file/openSUSE:Factory/obs-service-kiwi_label_helper/README?expand=1][=kiwi_label_helper=]]:
+
+#+begin_src xml
+<labels>
+  <suse_label_helper:add_prefix prefix="org.opensuse.tiny">
+    <label name="org.opencontainers.image.title" value="openSUSE Leap Base Container"/>
+  </suse_label_helper:add_prefix>
+</labels>
+#+end_src
+
+or [[https://build.opensuse.org/package/view_file/openSUSE:Factory/obs-service-docker_label_helper/README?expand=1][=docker_label_helper=]]:
+#+begin_src Dockerfile
+# labelprefix=org.opensuse.tiny
+LABEL org.opencontainers.image.title=openSUSE Leap Base Container"
+# endlabelprefix
+#+end_src
+
+expands to:
+#+begin_src json
+"Labels": {
+  "org.opencontainers.image.title": "openSUSE Leap Base Container",
+  "org.opensuse.tiny.title": "openSUSE Leap Base Container"
+}
+#+end_src
+
+
+* Questions?
+
+#+ATTR_REVEAL: :frag (appear)
+Answers!
