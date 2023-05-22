@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Everything that you never wanted to know about building Containers in OBS</title>
+<meta name="author" content="Dan Čermák"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="./node_modules/reveal.js/dist/reveal.css"/>
+
+<link rel="stylesheet" href="./node_modules/reveal.js/dist/theme/simple.css" id="theme"/>
+
+<link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-free/css/all.min.css"/>
+
+<link rel="stylesheet" href="./custom-style.css"/>
+<link rel="stylesheet" href="./node_modules/reveal.js/plugin/highlight/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = './node_modules/reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide"><h2 class="title">Everything that you never wanted to know about building Containers in OBS</h2>
+<p class="subtitle" style="color: Gray;"></p>
+<p class="author">Dan Čermák</p>
+<div style="float:left"><a href="https://events.opensuse.org/conferences/oSC23/" target="_blank"><img src="./media/oSC_city_design.svg" height="50px"/></a></div>
+<div style="float:right;font-size:35px;"><p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#"><a href="https://creativecommons.org/licenses/by/4.0" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">
+CC BY 4.0 <i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></a></p></div>
+</section>
+
+<section>
+<section id="slide-org5859ca1">
+<h2 id="org5859ca1">agenda</h2>
+<ul>
+<li><a href="#/slide-org5859ca1">agenda</a></li>
+<li><a href="#/slide-orgd5d56c9">who -u</a></li>
+<li><a href="#/slide-org82bd2a4">So you want to build containers?</a></li>
+<li><a href="#/slide-org732fe88">Available Tools</a>
+<ul>
+<li><a href="#/slide-org11cafee">When to use which?</a></li>
+<li><a href="#/slide-orgf612c1a">When not to use OBS</a></li>
+
+</ul></li>
+<li><a href="#/slide-org3aa496a">Minimal Docker Example</a>
+<ul>
+<li><a href="#/slide-org165e5b7">repository setup</a></li>
+<li><a href="#/slide-org29e0919"><code>prjconf</code></a></li>
+<li><a href="#/slide-org87a7010"><code>Dockerfile</code> peculiarities</a></li>
+
+</ul></li>
+<li><a href="#/slide-org6728e7c">Kiwi example</a></li>
+<li><a href="#/slide-orgebb185e">Multi-Arch</a></li>
+<li><a href="#/slide-orgb4f70fe">tagging images</a></li>
+<li><a href="#/slide-orgadf93ec">building against a registry</a></li>
+<li><a href="#/slide-orgad64e3e">keeping multiple versions around</a></li>
+<li><a href="#/slide-org359c4f5">build arguments</a></li>
+<li><a href="#/slide-org2ece569">Helper services</a></li>
+<li><a href="#/slide-orgecf0d5a"><code>obs-service-replace_using_package_version</code></a></li>
+<li><a href="#/slide-orgdfa68fa"><code>metainfo_helper</code></a></li>
+<li><a href="#/slide-org58752f9">Labels</a></li>
+<li><a href="#/slide-org9a1b2a8">Questions?</a></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgd5d56c9">
+<h2 id="orgd5d56c9">who -u</h2>
+<p>
+Dan Čermák
+</p>
+
+<p>
+ <div style="float:center">
+ <table class="who-table">
+ <tr><td><i class="fab fa-suse"></i></td><td> Software Developer @SUSE</td></tr>
+</p>
+
+<p>
+ <tr><td><i class="far fa-heart"></i></td><td> Developer Tools, Testing and Documentation, Home Automation</td></tr>
+ <tr></tr>
+ <tr></tr>
+ <tr><td><i class="fa-solid fa-globe"></i></td><td> <a href="https://dancermak.name/">https://dancermak.name</a></td></tr>
+ <tr><td><i class="fab fa-github"></i></td><td> <a href="https://github.com/dcermak/">dcermak</a></td></tr>
+ <tr><td><i class="fab fa-mastodon"></i></td><td> <a href="https://mastodon.social/@Defolos">@Defolos@mastodon.social</a></td></tr>
+ </table>
+ </div>
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org82bd2a4">
+<h2 id="org82bd2a4">So you want to build containers?</h2>
+<p>
+Why use OBS?
+</p>
+
+<ul>
+<li class="fragment appear">automated rebuilds</li>
+<li class="fragment appear">automatic publishing</li>
+<li class="fragment appear">create tiny images without (horrible) hacks</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org732fe88">
+<h2 id="org732fe88">Available Tools</h2>
+<ol>
+<li>Docker &amp; Podman</li>
+<li><a href="https://github.com/OSInside/kiwi">Kiwi</a></li>
+
+</ol>
+
+</section>
+<section id="slide-org11cafee">
+<h3 id="org11cafee">When to use which?</h3>
+<ul>
+<li class="fragment appear">whatever you are familiar with</li>
+<li class="fragment appear"><i class="fa-solid fa-minimize"></i> tiny image? \rar <code>kiwi</code>, else <code>docker/podman</code></li>
+
+</ul>
+
+
+</section>
+<section id="slide-orgf612c1a">
+<h3 id="orgf612c1a">When not to use OBS</h3>
+<ul>
+<li class="fragment appear">not using <code>zypper</code> / <code>dnf</code></li>
+<li class="fragment appear">complex <code>Dockerfile</code>, pulling many binaries</li>
+<li class="fragment appear">require previous releases to be available</li>
+
+</ul>
+
+
+</section>
+</section>
+<section>
+<section id="slide-org3aa496a">
+<h2 id="org3aa496a">Minimal Docker Example</h2>
+<div class="outline-text-2" id="text-org3aa496a">
+</div>
+</section>
+<section id="slide-org165e5b7">
+<h3 id="org165e5b7">repository setup</h3>
+<div class="org-src-container">
+
+<pre   ><code class="xml" >  &lt;repository name="standard"&gt;
+    &lt;path project="openSUSE:Factory" repository="images"/&gt;
+    &lt;path project="openSUSE:Factory:ARM" repository="images"/&gt;
+    &lt;path project="openSUSE:Factory:ARM" repository="standard"/&gt;
+    &lt;path project="openSUSE:Factory:PowerPC" repository="standard"/&gt;
+    &lt;path project="openSUSE:Factory:zSystems" repository="standard"/&gt;
+    &lt;path project="openSUSE:Factory" repository="snapshot"/&gt;
+    &lt;arch&gt;x86_64&lt;/arch&gt;
+    &lt;arch&gt;aarch64&lt;/arch&gt;
+    &lt;arch&gt;s390x&lt;/arch&gt;
+    &lt;arch&gt;ppc64le&lt;/arch&gt;
+  &lt;/repository&gt;
+  &lt;!-- snip --&gt;
+  &lt;repository name="containerfile"&gt;
+    &lt;path project="$THIS_PROJECT" repository="images"/&gt;
+    &lt;path project="$THIS_PROJECT" repository="standard"/&gt;
+    &lt;arch&gt;x86_64&lt;/arch&gt;
+    &lt;arch&gt;aarch64&lt;/arch&gt;
+    &lt;arch&gt;s390x&lt;/arch&gt;
+    &lt;arch&gt;ppc64le&lt;/arch&gt;
+  &lt;/repository&gt;
+&lt;/repository&gt;
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org29e0919">
+<h3 id="org29e0919"><code>prjconf</code></h3>
+<pre  class="example" >
+%if %_repository == "containerfile"
+Type: docker
+# optional:
+BuildEngine: podman
+%endif
+</pre>
+
+</section>
+<section id="slide-org87a7010">
+<h3 id="org87a7010"><code>Dockerfile</code> peculiarities</h3>
+<ul>
+<li><b>no</b> network access</li>
+<li>all zypper/dnf calls must be in <code>Dockerfile</code></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org6728e7c">
+<h2 id="org6728e7c">Kiwi example</h2>
+<ul>
+<li>how to use the from line (<code>#</code> instead of <code>:</code>)</li>
+
+</ul>
+<div class="org-src-container">
+
+<pre   ><code class="xml" >&lt;preferences&gt;
+  &lt;type image="docker" derived_from="obsrepositories:/suse/sle15#15.3"&gt;
+    &lt;containerconfig
+	name="bci/ruby"
+	tag="2.5"
+	maintainer="SUSE LLC (https://www.suse.com/)"
+	additionaltags="2.5-%RELEASE%,2,2-%RELEASE%"&gt;
+    &lt;/containerconfig&gt;
+  &lt;/type&gt;
+  &lt;version&gt;15.3.0&lt;/version&gt;
+&lt;/preferences&gt;
+</code></pre>
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgebb185e">
+<h2 id="orgebb185e">Multi-Arch</h2>
+<ul>
+<li><code>#!ArchExclusiveLine</code> / <code>#!ArchExcludedLine</code></li>
+<li><code>#!ExclusiveArch</code> / <code>#!ExcludeArch</code></li>
+
+</ul>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgb4f70fe">
+<h2 id="orgb4f70fe">tagging images</h2>
+<p>
+i.e. <code>docker build -t my/prefix:1.5 -t my/prefix:latest .</code>
+</p>
+
+<p>
+<code>Dockerfile</code>:
+</p>
+<div class="org-src-container">
+
+<pre   ><code class="Dockerfile" >#!BuildTag: my/prefix:1.5
+#!BuildTag: my/prefix:latest
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb4f70fe-split">
+<p>
+kiwi xml:
+</p>
+<div class="org-src-container">
+
+<pre   ><code class="xml" >&lt;!-- OBS-AddTag: my/prefix:1.5 my/prefix:latest --&gt;
+</code></pre>
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgadf93ec">
+<h2 id="orgadf93ec">building against a registry</h2>
+<ul>
+<li>create the registry as a <code>dod</code> project/repository (e.g. <a href="https://build.opensuse.org/project/show/SUSE:Registry"><code>SUSE:Registry</code></a>):</li>
+
+</ul>
+<div class="org-src-container">
+
+<pre   ><code class="xml" >&lt;publish&gt;
+  &lt;disable/&gt;
+&lt;/publish&gt;
+&lt;repository name="standard"&gt;
+  &lt;download arch="x86_64" url="https://registry.suse.com" repotype="registry"/&gt;
+  &lt;download arch="aarch64" url="https://registry.suse.com" repotype="registry"/&gt;
+  &lt;arch&gt;x86_64&lt;/arch&gt;
+  &lt;arch&gt;aarch64&lt;/arch&gt;
+&lt;/repository&gt;
+</code></pre>
+</div>
+
+<ul>
+<li>Add it to your project <code>_meta</code>:</li>
+
+</ul>
+<div class="org-src-container">
+
+<pre   ><code class="xml" >&lt;repository name="standard"&gt;
+  &lt;!-- replace with the appropriate project name --&gt;
+  &lt;path project="SUSE:Registry" repository="standard"/&gt;
+  &lt;!-- additional paths --&gt;
+  &lt;arch&gt;x86_64&lt;/arch&gt;
+  &lt;arch&gt;aarch64&lt;/arch&gt;
+&lt;/repository&gt;
+</code></pre>
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgad64e3e">
+<h2 id="orgad64e3e">keeping multiple versions around</h2>
+
+</section>
+</section>
+<section>
+<section id="slide-org359c4f5">
+<h2 id="org359c4f5">build arguments</h2>
+
+</section>
+</section>
+<section>
+<section id="slide-org2ece569">
+<h2 id="org2ece569">Helper services</h2>
+<p>
+<code>curl -f https://path/to/binary.tar.gz -o binary.tar.gz</code>
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="Dockerfile" >#!RemoteAssetUrl https://path/to/binary.tar.gz
+COPY binary.tar.gz .
+</code></pre>
+</div>
+
+<p>
+or
+</p>
+<div class="org-src-container">
+
+<pre   ><code class="xml" >&lt;!-- OBS-RemoteAsset: https://path/to/binary.tar.gz --&gt;
+</code></pre>
+</div>
+
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgecf0d5a">
+<h2 id="orgecf0d5a"><code>obs-service-replace_using_package_version</code></h2>
+<p>
+ https://github.com/openSUSE/obs-service-replace_using_package_version
+</p>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgdfa68fa">
+<h2 id="orgdfa68fa"><code>metainfo_helper</code></h2>
+
+
+</section>
+</section>
+<section>
+<section id="slide-org58752f9">
+<h2 id="org58752f9">Labels</h2>
+<ul>
+<li class="fragment appear">key-value metadata for a container image</li>
+<li class="fragment appear">pre-defined keys: <a href="https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys"><code>org.opencontainers.image.**</code></a></li>
+<li class="fragment appear">openSUSE <a href="https://en.opensuse.org/Building_derived_containers#Labels">label rules</a></li>
+<li class="fragment appear">labels of the base image get overwritten</li>
+
+</ul>
+
+
+</section>
+<section id="slide-org58752f9-split">
+
+<p>
+preserve <code>LABEL</code> them using <a href="https://build.opensuse.org/package/view_file/openSUSE:Factory/obs-service-kiwi_label_helper/README?expand=1"><code>kiwi_label_helper</code></a>:
+</p>
+
+<div class="org-src-container">
+
+<pre   ><code class="xml" >&lt;labels&gt;
+  &lt;suse_label_helper:add_prefix prefix="org.opensuse.tiny"&gt;
+    &lt;label name="org.opencontainers.image.title" value="openSUSE Leap Base Container"/&gt;
+  &lt;/suse_label_helper:add_prefix&gt;
+&lt;/labels&gt;
+</code></pre>
+</div>
+
+<p>
+or <a href="https://build.opensuse.org/package/view_file/openSUSE:Factory/obs-service-docker_label_helper/README?expand=1"><code>docker_label_helper</code></a>:
+</p>
+<div class="org-src-container">
+
+<pre   ><code class="Dockerfile" ># labelprefix=org.opensuse.tiny
+LABEL org.opencontainers.image.title=openSUSE Leap Base Container"
+# endlabelprefix
+</code></pre>
+</div>
+
+<p>
+expands to:
+</p>
+<div class="org-src-container">
+
+<pre   ><code class="json" >"Labels": {
+  "org.opencontainers.image.title": "openSUSE Leap Base Container",
+  "org.opensuse.tiny.title": "openSUSE Leap Base Container"
+}
+</code></pre>
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-org9a1b2a8">
+<h2 id="org9a1b2a8">Questions?</h2>
+<p class="fragment (appear)">
+Answers!
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="./node_modules/reveal.js/dist/reveal.js"></script>
+<script src="./node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+<script src="./node_modules/reveal.js/plugin/notes/notes.js"></script>
+
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+plugins: [RevealHighlight, RevealNotes, history],
+transition: 'none', hash: true
+});
+
+</script>
+</body>
+</html>
