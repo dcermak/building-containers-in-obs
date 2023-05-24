@@ -23,29 +23,8 @@
 #+REVEAL_TITLE_SLIDE: <div style="float:right;font-size:35px;"><p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#"><a href="https://creativecommons.org/licenses/by/4.0" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">
 #+REVEAL_TITLE_SLIDE: CC BY 4.0 <i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></a></p></div>
 
-* agenda
+* Agenda
 
-  - [[agenda][agenda]]
-  - [[who -u][who -u]]
-  - [[So you want to build containers?][So you want to build containers?]]
-  - [[Available Tools][Available Tools]]
-    - [[When to use which?][When to use which?]]
-    - [[When not to use OBS][When not to use OBS]]
-  - [[Minimal Docker Example][Minimal Docker Example]]
-    - [[repository setup][repository setup]]
-    - [[=prjconf=][=prjconf=]]
-    - [[=Dockerfile= peculiarities][=Dockerfile= peculiarities]]
-  - [[Kiwi example][Kiwi example]]
-  - [[Multi-Arch][Multi-Arch]]
-  - [[tagging images][tagging images]]
-  - [[building against a registry][building against a registry]]
-  - [[keeping multiple versions around][keeping multiple versions around]]
-  - [[build arguments][build arguments]]
-  - [[Helper services][Helper services]]
-  - [[=obs-service-replace_using_package_version=][=obs-service-replace_using_package_version=]]
-  - [[=metainfo_helper=][=metainfo_helper=]]
-  - [[Labels][Labels]]
-  - [[Questions?][Questions?]]
 
 * who -u
 
@@ -54,7 +33,7 @@ Dan Čermák
 @@html: <div style="float:center">@@
 @@html: <table class="who-table">@@
 @@html: <tr><td><i class="fab fa-suse"></i></td><td> Software Developer @SUSE</td></tr>@@
-# @@html: <tr><td><i class="fab fa-fedora"></i></td><td> i3 SIG, Package maintainer</td></tr>@@
+@@html: <tr><td><i class="fab fa-fedora"></i></td><td> i3 SIG, Package maintainer</td></tr>@@
 @@html: <tr><td><i class="far fa-heart"></i></td><td> Developer Tools, Testing and Documentation, Home Automation</td></tr>@@
 @@html: <tr></tr>@@
 @@html: <tr></tr>@@
@@ -71,10 +50,12 @@ Why use OBS?
 #+ATTR_REVEAL: :frag (appear)
 - automated rebuilds
 - automatic publishing
-- create tiny images without (horrible) hacks
+- create official openSUSE/SLE image
+- create tiny images without (😱 horrible) hacks
 
 * Available Tools
 
+#+ATTR_REVEAL: :frag (appear)
 1. Docker & Podman
 2. [[https://github.com/OSInside/kiwi][Kiwi]]
 
@@ -82,20 +63,22 @@ Why use OBS?
 
 #+ATTR_REVEAL: :frag (appear)
 - whatever you are familiar with
-- @@html:<i class="fa-solid fa-minimize"></i>@@ tiny image? \rar =kiwi=, else =docker/podman=
+- @@html:<i class="fa-solid fa-minimize"></i>@@ tiny image? \rightarrow =kiwi=
+- 🤔 undecided? \rightarrow =docker= / =podman=
 
 
 ** When not to use OBS
 
 #+ATTR_REVEAL: :frag (appear)
-- not using =zypper= / =dnf=
+- not using =zypper=, =dnf= or =apt=
 - complex =Dockerfile=, pulling many binaries
 - require previous releases to be available
+- very unfamiliar with OBS
 
 
 * Minimal Docker Example
 
-** repository setup
+** Repository Setup
 
 #+begin_src xml
   <repository name="standard">
@@ -132,17 +115,42 @@ BuildEngine: podman
 %endif
 #+end_src
 
+** =Dockerfile=
+
+#+begin_NOTES
+- no full url in =FROM= \Rightarrow use build tag
+#+end_NOTES
+
+#+begin_src Dockerfile
+FROM opensuse/tumbleweed:latest
+#!BuildTag: opensuse/git:latest
+RUN zypper -n in git
+CMD ["/usr/bin/git"]
+#+end_src
+
+
 ** =Dockerfile= peculiarities
 
+#+ATTR_REVEAL: :frag (appear)
 - *no* network access
+- all layers squashed
+- installs [[https://github.com/openSUSE/obs-build/blob/master/obs-docker-support][=obs-docker-support=]]
+- =USER= *must* be =root=
 - all zypper/dnf calls must be in =Dockerfile=
 
-* Kiwi example
 
-- how to use the from line (=#= instead of =:=)
+* Kiwi example
+#+BEGIN_NOTES
+- =from= line: =#= instead of =:=, =obsrepositories= takes container from repos
+#+END_NOTES
+
+#+ATTR_REVEAL: :code_attribs data-line-numbers='|1|1-4|6|6-12|14'
 #+begin_src xml
+<image schemaversion="6.5" name="$name-image" xmlns:suse_label_helper="com.suse.label_helper">
+  <!-- snip -->
   <preferences>
-    <type image="docker" derived_from="obsrepositories:/suse/sle15#15.3">
+    <type image="docker"
+          derived_from="obsrepositories:/suse/sle15#15.3">
       <containerconfig
           name="bci/ruby"
           tag="2.5"
@@ -152,87 +160,279 @@ BuildEngine: podman
     </type>
     <version>15.3.0</version>
   </preferences>
+  <!-- snip -->
+</image>
 #+end_src
 
 
+* Registry Frontend
+
+@@html: <img src="./media/openSUSE_Registry.png" height="400px"/>@@
+
+[[https://registry.opensuse.org/][registry.opensuse.org/]] + ~${prj_name/:/\/}.lower()~ + ~/$REPO/$BUILD_TAG~
+
+
+* Local Testing
+
+#+ATTR_REVEAL: :code_attribs data-line-numbers='1|1-4|6|6-12|10-12|14'
+#+begin_src bash
+❯ osc build --clean images
+# *snip*
+/var/tmp/build-root/images-x86_64/usr/src/packages/KIWI/registry-image.x86_64-2023-Build.docker.tar
+/var/tmp/build-root/images-x86_64/usr/src/packages/KIWI/registry-image.x86_64-2023-Build.docker.tar.sha256
+
+❯ podman load -i /var/tmp/build-root/images-x86_64/usr/src/packages/KIWI/registry-image.x86_64-2023-Build.docker.tar
+Getting image source signatures
+# *snip*
+Storing signatures
+Loaded image: docker.io/opensuse/registry:2.8
+Loaded image: docker.io/opensuse/registry:2.8-
+Loaded image: docker.io/opensuse/registry:latest
+
+❯ podman run --rm -it docker.io/opensuse/registry:2.8
+#+end_src
+
 * Multi-Arch
 
+#+ATTR_REVEAL: :frag (appear appear) :frag_idx (1 2)
+- one =Dockerfile= for *all* architectures
+- exclude/build only on architectures:
+#+ATTR_REVEAL: :frag appear :frag_idx 2
+#+begin_src Dockerfile
+#!ExclusiveArch: x86_64 aarch64
+#!ExcludeArch: s390x ppc64le
+#+end_src
 
-- =#!ArchExclusiveLine= / =#!ArchExcludedLine=
-- =#!ExclusiveArch= / =#!ExcludeArch=
+#+ATTR_REVEAL: :frag appear :frag_idx 3
+- add tricks like:
+#+ATTR_REVEAL: :frag appear :frag_idx 3
+#+begin_src Dockerfile
+RUN [ $(uname -m) = "x86_64" ] && zypper -n in amd64-only-pkg
+#+end_src
+
+#+ATTR_REVEAL: :frag appear :frag_idx 4
+- exclude/include lines for *scheduler*:
+#+ATTR_REVEAL: :frag appear :frag_idx 4
+#+begin_src Dockerfile
+#!ArchExclusiveLine x86_64
+RUN [ $(uname -m) = "x86_64" ] && zypper -n in amd64-only-pkg
+#!ArchExcludedLine x86_64
+RUN [ $(uname -m) = "x86_64" ] || zypper -n in non-amd64-pkg
+#+end_src
 
 
-* tagging images
+* Tagging Images
 
-i.e. ~docker build -t my/prefix:1.5 -t my/prefix:latest .~
+#+begin_src bash
+docker build -t my/prefix:1.5 -t my/prefix:latest .
+#+end_src
 
+#+ATTR_REVEAL: :frag appear :frag_idx 2
 =Dockerfile=:
+#+ATTR_REVEAL: :frag appear :frag_idx 2
 #+begin_src Dockerfile
 #!BuildTag: my/prefix:1.5
 #!BuildTag: my/prefix:latest
 #+end_src
 
-#+REVEAL: split
+#+ATTR_REVEAL: :frag appear :frag_idx 3
 kiwi xml:
+#+ATTR_REVEAL: :frag appear :frag_idx 3
 #+begin_src xml
 <!-- OBS-AddTag: my/prefix:1.5 my/prefix:latest -->
 #+end_src
 
 
-* building against a registry
+* Building against a Registry
 
+#+ATTR_REVEAL: :frag appear
 - create the registry as a =dod= project/repository (e.g. [[https://build.opensuse.org/project/show/SUSE:Registry][=SUSE:Registry=]]):
+#+ATTR_REVEAL: :frag appear :code_attribs data-line-numbers='1|3|4-9|5-7|8|'
 #+begin_src xml
-  <publish>
-    <disable/>
-  </publish>
+<project name="home:$username:registry">
+  <!-- snip -->
+  <publish><disable/></publish>
   <repository name="standard">
-    <download arch="x86_64" url="https://registry.suse.com" repotype="registry"/>
-    <download arch="aarch64" url="https://registry.suse.com" repotype="registry"/>
+    <download arch="x86_64"
+              url="https://registry.suse.com"
+              repotype="registry"/>
+    <arch>x86_64</arch>
+  </repository>
+</project>
+#+end_src
+
+#+REVEAL: split
+#+ATTR_REVEAL: :frag appear
+- Add it to your project =_meta=:
+#+ATTR_REVEAL: :code_attribs data-line-numbers='1|3-8|4|5|6-7|3-8'
+#+begin_src xml
+<project name="home:$username:containers">
+  <!-- snip -->
+  <repository name="standard">
+    <path project="home:$username:registry" repository="standard"/>
+    <!-- additional paths -->
     <arch>x86_64</arch>
     <arch>aarch64</arch>
   </repository>
+</project>
 #+end_src
 
-- Add it to your project =_meta=:
+** =have choice for=
+
+#+begin_src bash
+❯ osc buildinfo -d $prj $pkg containers x86_64|grep container
+undecided about (direct):container:bci/openjdk:11: container:bci-openjdk-11@devel:BCI:SLE-15-SP4/containerfile container:bci_openjdk:11@SUSE:Registry/standard
+#+end_src
+
+
+\Rightarrow =Prefer: -container:bci_openjdk:11= or =Prefer: -container:bci-openjdk-11=
+
+
+* Keeping multiple versions around
+
+@@html: <img src="./media/persist_releases.svg"/>@@
+
+#+REVEAL: split
+
+rebuild repository:
+#+ATTR_REVEAL: :code_attribs data-line-numbers='1|3-4|3-8'
 #+begin_src xml
-<repository name="standard">
-  <!-- replace with the appropriate project name -->
-  <path project="SUSE:Registry" repository="standard"/>
-  <!-- additional paths -->
-  <arch>x86_64</arch>
-  <arch>aarch64</arch>
-</repository>
+<project name=":Rebuild">
+  <!-- snip -->
+  <repository name="images">
+    <releasetarget project=":Release" repository="containers" trigger="manual"/>
+    <!-- ordinary paths here -->
+    <arch>x86_64</arch>
+    <arch>aarch64</arch>
+  </repository>
+</project>
+#+end_src
+
+release repository:
+#+ATTR_REVEAL: :code_attribs data-line-numbers='1|3|4|5-9'
+#+begin_src xml
+<project name=":Release" kind="maintenance_release">
+  <!-- snip -->
+  <build><disable/></build>
+  <publish><enable/></publish>
+  <repository name="containers">
+    <path project="openSUSE:Tumbleweed" repository="standard"/>
+    <arch>x86_64</arch>
+    <arch>aarch64</arch>
+  </repository>
+</project>
+#+end_src
+
+release:
+#+begin_src bash
+osc release :Rebuild $image_name
 #+end_src
 
 
-* keeping multiple versions around
+* Build Arguments
 
-* build arguments
+#+ATTR_REVEAL: :frag (appear) :frag_idx 1
+#+begin_src Dockerfile
+ARG VERSION
+ARG DEFAULT_USER=me
+#+end_src
+
+#+ATTR_REVEAL: :frag (appear) :frag_idx 2 :code_attribs data-line-numbers='1|2'
+#+begin_src bash
+buildah bud --build-arg="VERSION=1.4.2" .
+docker build --build-arg="VERSION=1.4.2" .
+#+end_src
+
+#+ATTR_REVEAL: :frag (appear) :frag_idx 4
+~osc meta prjconf~
+#+ATTR_REVEAL: :frag (appear) :frag_idx 4
+#+begin_src Dockerfile
+BuildFlags: dockerarg:VERSION=1.4.2
+#+end_src
+
 
 * Helper services
 
-~curl -f https://path/to/binary.tar.gz -o binary.tar.gz~
+#+ATTR_REVEAL: :frag (appear) :frag_idx 1
+#+begin_src Dockerfile
+RUN curl -f https://path/to/binary.tar.gz -o binary.tar.gz
+#+end_src
 
+#+ATTR_REVEAL: :frag (appear) :frag_idx 2
+replace with:
+#+ATTR_REVEAL: :frag (appear) :frag_idx 2
 #+begin_src Dockerfile
 #!RemoteAssetUrl https://path/to/binary.tar.gz
 COPY binary.tar.gz .
 #+end_src
 
+#+ATTR_REVEAL: :frag (appear) :frag_idx 3
 or
+#+ATTR_REVEAL: :frag (appear) :frag_idx 3
 #+begin_src xml
 <!-- OBS-RemoteAsset: https://path/to/binary.tar.gz -->
 #+end_src
 
 
+* =replace_using_package_version=
 
-* =obs-service-replace_using_package_version=
+#+ATTR_REVEAL: :frag (appear)
+tag & set env vars from package versions
 
-@@html: https://github.com/openSUSE/obs-service-replace_using_package_version@@
+#+begin_src Dockerfile
+#!BuildTag: opensuse/389-ds:%%389ds_version%%
+#+end_src
+
+#+begin_src xml
+<services>
+  <service name="replace_using_package_version" mode="buildtime">
+    <param name="file">Dockerfile</param>
+    <param name="regex">%%389ds_version%%</param>
+    <param name="package">389-ds</param>
+    <param name="parse-version">minor</param>
+  </service>
+</services>
+#+end_src
+
+source: @@html: <i class="fa-brands fa-github"></i>@@ [[https://github.com/openSUSE/obs-service-replace_using_package_version][=openSUSE/obs-service-replace_using_package_version=]]
 
 
 * =metainfo_helper=
 
+source: [[https://build.opensuse.org/package/view_file/openSUSE:Tools/obs-service-kiwi_metainfo_helper/README?expand=1][=kiwi_metainfo_helper=]]
+
+replaces =%RELEASE%=, =%OS_VERSION%=, etc. in =kiwi.xml=, =Dockerfile= & =Chart.yaml=
+
+#+begin_src Dockerfile
+#!BuildTag: bci/bci-init:%OS_VERSION_ID_SP%
+LABEL org.opencontainers.image.created="%BUILDTIME%"
+LABEL org.opencontainers.image.source="%SOURCEURL%"
+LABEL org.opensuse.reference="registry.suse.com/bci/bci-init:%OS_VERSION_ID_SP%.%RELEASE%"
+LABEL org.openbuildservice.disturl="%DISTURL%"
+#+end_src
+
+
+* =replace_using_env=
+
+- replaces =%%VARNAME%%= with =$VARNAME= from the build environment
+- can run scripts before the build (\rightarrow to set the =env=)
+#+begin_src Dockerfile
+#!BuildTag: opensuse/virt-operator:%%PKG_VERSION%%-%%PKG_RELEASE%%
+ENV KUBEVIRT_VERSION=%%PKG_VERSION%%
+#+end_src
+
+#+begin_src xml
+<services>
+  <service mode="buildtime" name="replace_using_env">
+    <param name="file">Dockerfile</param>
+    <param name="var">PKG_VERSION</param>
+    <param name="var">TAGPREFIX</param>
+    <param name="eval">/path/to/my/script/here</param>
+  </service>
+</services>
+#+end_src
+
+- hint: anything from =_prjconf= can be evaluated via ~rpm -E %macro~
 
 * Labels
 
