@@ -1,6 +1,6 @@
 # -*- org-confirm-babel-evaluate: nil; -*-
 #+AUTHOR: Dan Čermák
-#+DATE: May 16, 2023
+#+DATE: May 26, 2023
 #+EMAIL: dcermak@suse.com
 #+TITLE: Everything that you never wanted to know about building containers in OBS
 
