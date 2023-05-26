@@ -70,8 +70,8 @@ Why use OBS?
 
 #+ATTR_REVEAL: :frag (appear)
 - whatever you are familiar with
-- @@html:<i class="fa-solid fa-minimize"></i>@@ tiny image? \rightarrow =kiwi=
 - 🤔 undecided? \rightarrow =docker= / =podman=
+- @@html:<i class="fa-solid fa-minimize"></i>@@ tiny image? \rightarrow =kiwi=
 
 
 ** When not to use OBS
@@ -88,7 +88,7 @@ Why use OBS?
 ** Repository Setup
 
 from [[https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta][=devel:BCI:Tumbleweed=]]:
-#+ATTR_REVEAL: :frag (appear) :code_attribs data-line-numbers='|2-7|8-11|14-21|15-16|17-20|'
+#+ATTR_REVEAL: :frag (appear) :code_attribs data-line-numbers='|1-12|2-7|8-11|14-21|15-16|17-20|'
 #+begin_src xml
   <repository name="standard">
     <path project="openSUSE:Factory" repository="images"/>
@@ -166,7 +166,7 @@ CMD ["/usr/bin/git"]
 #+ATTR_REVEAL: :frag (appear)
 - *no* network access
 - all layers squashed
-- installs [[https://github.com/openSUSE/obs-build/blob/master/obs-docker-support][=obs-docker-support=]]
+- installs & removes [[https://github.com/openSUSE/obs-build/blob/master/obs-docker-support][=obs-docker-support=]]
 - =USER= *must* be =root=
 - all zypper/dnf calls must be in =Dockerfile=
 
@@ -176,9 +176,10 @@ CMD ["/usr/bin/git"]
 - =from= line: =#= instead of =:=, =obsrepositories= takes container from repos
 #+END_NOTES
 
-#+ATTR_REVEAL: :code_attribs data-line-numbers='|1|3-14|4-5|6-10|7|8|9|10|13|'
+#+ATTR_REVEAL: :code_attribs data-line-numbers='|1-2|4-15|5-6|7-11|8|9|10|11|14|'
 #+begin_src xml
-<image schemaversion="6.5" name="$name-image" xmlns:suse_label_helper="com.suse.label_helper">
+<image schemaversion="6.5" name="$name-image"
+       xmlns:suse_label_helper="com.suse.label_helper">
   <!-- snip -->
   <preferences>
     <type image="docker"
@@ -199,7 +200,7 @@ CMD ["/usr/bin/git"]
 ** Repository setup
 
 based on [[https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta][=devel:BCI:Tumbleweed=]]:
-#+ATTR_REVEAL: :code_attribs data-line-numbers='|1|2-7|8-11|13|14-15|16-19|'
+#+ATTR_REVEAL: :code_attribs data-line-numbers='|1-12|1|2-7|8-11|13-20|13|14-15|16-19|'
 #+begin_src xml
   <repository name="standard">
     <path project="openSUSE:Factory" repository="images"/>
@@ -452,12 +453,13 @@ source: @@html: <i class="fa-brands fa-github"></i>@@ [[https://github.com/openS
 
 * =metainfo_helper=
 
-#+ATTR_REVEAL: :frag (appear) :frag_idx 1
-source: [[https://build.opensuse.org/package/view_file/openSUSE:Tools/obs-service-kiwi_metainfo_helper/README?expand=1][=kiwi_metainfo_helper=]]
+#+ATTR_REVEAL: :frag (appear appear appear appear) :frag_idx (1 2 3 4)
+- source: [[https://build.opensuse.org/package/view_file/openSUSE:Tools/obs-service-kiwi_metainfo_helper/README?expand=1][=kiwi_metainfo_helper=]]
+- =%RELEASE%= \Rightarrow =<cicnt\>.<bldcnt\>=
+- =%OS_VERSION%= \Rightarrow from =/etc/os-release=
+- replaces in build recipe (=kiwi.xml=, =Dockerfile=, =Chart.yaml=)
 
-#+ATTR_REVEAL: :frag (appear) :frag_idx 2
-replaces =%RELEASE%=, =%OS_VERSION%=, etc. in =kiwi.xml=, =Dockerfile= & =Chart.yaml=
-
+#+ATTR_REVEAL: :frag (appear) :frag_idx 5
 #+begin_src Dockerfile
 #!BuildTag: bci/bci-init:%OS_VERSION_ID_SP%
 LABEL org.opencontainers.image.created="%BUILDTIME%"
@@ -469,13 +471,17 @@ LABEL org.openbuildservice.disturl="%DISTURL%"
 
 * =replace_using_env=
 
+#+ATTR_REVEAL: :frag (appear appear)  :frag_idx (1 2)
 - replaces =%%VARNAME%%= with =$VARNAME= from the build environment
 - can run scripts before the build (\rightarrow to set the =env=)
+
+#+ATTR_REVEAL: :frag (appear) :frag_idx 3
 #+begin_src Dockerfile
 #!BuildTag: opensuse/virt-operator:%%PKG_VERSION%%-%%PKG_RELEASE%%
 ENV KUBEVIRT_VERSION=%%PKG_VERSION%%
 #+end_src
 
+#+ATTR_REVEAL: :frag (appear) :frag_idx 4
 #+begin_src xml
 <services>
   <service mode="buildtime" name="replace_using_env">
@@ -487,7 +493,8 @@ ENV KUBEVIRT_VERSION=%%PKG_VERSION%%
 </services>
 #+end_src
 
-- hint: anything from =_prjconf= can be evaluated via ~rpm -E %macro~
+#+ATTR_REVEAL: :frag (appear) :frag_idx (5)
+- @@html: <i class="fa-regular fa-lightbulb"></i>@@: anything from =_prjconf= can be evaluated via ~rpm -E %macro~
 
 * Labels
 
@@ -619,6 +626,14 @@ release:
 #+begin_src bash
 osc release :Rebuild $image_name
 #+end_src
+
+
+* What else is there?
+
+#+ATTR_REVEAL: :frag (appear)
+- [[https://opensuse.github.io/obs-build/pbuild.html#_remote_assets][=pbuild=]]
+- [[https://openbuildservice.org/help/manuals/obs-user-guide/cha.obs.scm_ci_workflow_integration.html][SCM CI integration]]
+- [[https://rabbit.opensuse.org/][rabbit.opensuse.org]]
 
 
 * Demo!
