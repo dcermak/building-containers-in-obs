@@ -88,6 +88,7 @@ Why use OBS?
 ** Repository Setup
 
 from [[https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta][=devel:BCI:Tumbleweed=]]:
+#+ATTR_REVEAL: :frag (appear) :code_attribs data-line-numbers='|2-7|8-11|14-21|15-16|17-20|'
 #+begin_src xml
   <repository name="standard">
     <path project="openSUSE:Factory" repository="images"/>
@@ -115,6 +116,7 @@ from [[https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta][=devel:BCI
 
 #+REVEAL: split
 based on [[https://build.opensuse.org/project/show/openSUSE:Templates:Images:Tumbleweed][=openSUSE:Templates:Images:Tumbleweed=]]:
+#+ATTR_REVEAL: :frag (appear) :code_attribs data-line-numbers='|3-5|6-8|9-11|12-15|'
 #+begin_src xml
 <project name="$basename:Images:Tumbleweed">
   <!-- snip -->
@@ -136,7 +138,6 @@ based on [[https://build.opensuse.org/project/show/openSUSE:Templates:Images:Tum
 
 ** =prjconf=
 
-#+ATTR_REVEAL: :frag (appear) :code_attribs data-line-numbers='|1|2|4|'
 #+begin_src
 %if %_repository == "containerfile"
 Type: docker
@@ -197,8 +198,34 @@ CMD ["/usr/bin/git"]
 
 ** Repository setup
 
+based on [[https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta][=devel:BCI:Tumbleweed=]]:
+#+ATTR_REVEAL: :code_attribs data-line-numbers='|1|2-7|8-11|13|14-15|16-19|'
+#+begin_src xml
+  <repository name="standard">
+    <path project="openSUSE:Factory" repository="images"/>
+    <path project="openSUSE:Factory:ARM" repository="images"/>
+    <path project="openSUSE:Factory:ARM" repository="standard"/>
+    <path project="openSUSE:Factory:PowerPC" repository="standard"/>
+    <path project="openSUSE:Factory:zSystems" repository="standard"/>
+    <path project="openSUSE:Factory" repository="snapshot"/>
+    <arch>x86_64</arch>
+    <arch>aarch64</arch>
+    <arch>s390x</arch>
+    <arch>ppc64le</arch>
+  </repository>
+  <repository name="images">
+    <path project="devel:BCI:Tumbleweed" repository="containerfile"/>
+    <path project="devel:BCI:Tumbleweed" repository="standard"/>
+    <arch>x86_64</arch>
+    <arch>aarch64</arch>
+    <arch>s390x</arch>
+    <arch>ppc64le</arch>
+  </repository>
+#+end_src
+
+#+REVEAL: split
 based on [[https://build.opensuse.org/project/show/openSUSE:Templates:Images:Tumbleweed][=openSUSE:Templates:Images:Tumbleweed=]]:
-#+ATTR_REVEAL: :code_attribs data-line-numbers='|1|3-5|6|6-12|10-12|14'
+#+ATTR_REVEAL: :code_attribs data-line-numbers='|1|3-5|6-8|9-11|12-15|'
 #+begin_src xml
 <project name="$prefix:Images:Tumbleweed">
   <!-- snip -->
@@ -354,6 +381,7 @@ RUN [ $(uname -m) = "x86_64" ] || zypper -n in non-amd64-pkg
 
 ** =have choice for=
 
+#+ATTR_REVEAL: :frag appear :frag_idx 1
 #+begin_src bash
 ❯ osc buildinfo -d $prj $pkg containers x86_64|grep container
 undecided about (direct):container:bci/openjdk:11:
@@ -361,7 +389,7 @@ undecided about (direct):container:bci/openjdk:11:
     container:bci_openjdk:11@SUSE:Registry/standard
 #+end_src
 
-#+ATTR_REVEAL: :frag appear
+#+ATTR_REVEAL: :frag appear :frag_idx 2
 #+begin_src rpm
 Prefer: -container:bci_openjdk:11
 # or
@@ -401,14 +429,18 @@ or
 tag & set env vars from package versions
 
 #+ATTR_REVEAL: :frag (appear) :frag_idx 2
+source: @@html: <i class="fa-brands fa-github"></i>@@ [[https://github.com/openSUSE/obs-service-replace_using_package_version][=openSUSE/obs-service-replace_using_package_version=]]
+
+#+ATTR_REVEAL: :frag (appear) :frag_idx 3
 #+begin_src Dockerfile
 #!BuildTag: opensuse/389-ds:%%389ds_version%%
 #+end_src
 
-#+ATTR_REVEAL: :frag (appear) :frag_idx 3 :code_attribs data-line-numbers='|2|3|4|5|6|'
+#+ATTR_REVEAL: :frag (appear) :frag_idx 4 :code_attribs data-line-numbers='|2-3|4|5|6|7|'
 #+begin_src xml
 <services>
-  <service name="replace_using_package_version" mode="buildtime">
+  <service name="replace_using_package_version"
+           mode="buildtime">
     <param name="file">Dockerfile</param>
     <param name="regex">%%389ds_version%%</param>
     <param name="package">389-ds</param>
@@ -417,14 +449,13 @@ tag & set env vars from package versions
 </services>
 #+end_src
 
-#+ATTR_REVEAL: :frag (appear) :frag_idx 4
-source: @@html: <i class="fa-brands fa-github"></i>@@ [[https://github.com/openSUSE/obs-service-replace_using_package_version][=openSUSE/obs-service-replace_using_package_version=]]
-
 
 * =metainfo_helper=
 
+#+ATTR_REVEAL: :frag (appear) :frag_idx 1
 source: [[https://build.opensuse.org/package/view_file/openSUSE:Tools/obs-service-kiwi_metainfo_helper/README?expand=1][=kiwi_metainfo_helper=]]
 
+#+ATTR_REVEAL: :frag (appear) :frag_idx 2
 replaces =%RELEASE%=, =%OS_VERSION%=, etc. in =kiwi.xml=, =Dockerfile= & =Chart.yaml=
 
 #+begin_src Dockerfile
