@@ -409,7 +409,7 @@ RUN curl -f https://path/to/binary.tar.gz -o binary.tar.gz
 replace with:
 #+ATTR_REVEAL: :frag (appear) :frag_idx 2
 #+begin_src Dockerfile
-#!RemoteAssetUrl https://path/to/binary.tar.gz
+#!RemoteAssetUrl: https://path/to/binary.tar.gz
 COPY binary.tar.gz .
 #+end_src
 
