@@ -223,8 +223,6 @@ export default class PrintView {
 		// Notify subscribers that the PDF layout is good to go
 		this.Reveal.dispatchEvent({ type: 'pdf-ready' });
 
-		viewportElement.classList.remove( 'loading-scroll-mode' );
-
 	}
 
 	/**
