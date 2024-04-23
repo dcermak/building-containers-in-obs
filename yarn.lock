@@ -7,7 +7,7 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-6.5.2.tgz#310fe90cb5a8dee9698833171b98e7835404293d"
   integrity sha512-hRILoInAx8GNT5IMkrtIt9blOdrqHOnPBH+k70aWUAqPZPgopb9G5EQJFpaBx/S8zp2fC+mPW349Bziuk1o28Q==
 
-reveal.js@^5.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/reveal.js/-/reveal.js-5.0.1.tgz#c489425bbc42c2160b1198584113e9419b43a593"
-  integrity sha512-cgbEasV/Yh8QIRyCCiOHRtio6uxAwmOAhyr80vegX2P69/iwE1FX77EXJ9NAPvcODxoIyYrgvxAaPxR5TKcsFw==
+reveal.js@^5.1:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/reveal.js/-/reveal.js-5.1.0.tgz#dfaa4631127e739aa8ebbaa425d653e72d799e66"
+  integrity sha512-KDt7m0+xwKV6nAZt4CNPVFBf42sTKRQapg0bGGKB5PKO5XvChnMfwlZkybydHiQJ7p5+6LbHKRGrhXODdoNIaA==
