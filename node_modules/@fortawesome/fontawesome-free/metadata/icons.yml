@@ -4274,6 +4274,7 @@ bluesky:
   changes:
     - 6.5.2
     - 6.7.0
+    - 6.7.1
   label: Bluesky
   search:
     terms:
@@ -12148,6 +12149,17 @@ cruzeiro-sign:
   styles:
     - solid
   unicode: e152
+  voted: false
+css:
+  changes:
+    - 6.7.0
+  label: Css
+  search:
+    terms:
+      - rebecca purple
+  styles:
+    - brands
+  unicode: e6a2
   voted: false
 css3:
   changes:
@@ -25095,6 +25107,7 @@ laravel:
     - 5.0.0
     - 5.0.3
     - 5.11.2
+    - 6.7.1
   label: Laravel
   search:
     terms: []
@@ -37539,6 +37552,17 @@ square-binary:
     - solid
   unicode: e69b
   voted: false
+square-bluesky:
+  changes:
+    - 6.7.1
+  label: Square Bluesky
+  search:
+    terms:
+      - social network
+  styles:
+    - brands
+  unicode: e6a3
+  voted: false
 square-caret-down:
   aliases:
     names:
@@ -38131,6 +38155,7 @@ square-parking:
     - 6.5.0
     - 6.6.0
     - 6.7.0
+    - 6.7.1
   label: Square Parking
   search:
     terms:

@@ -583,6 +583,7 @@ coding:
     - code-merge
     - code-pull-request
     - comment-nodes
+    - css
     - cube
     - cubes
     - diagram-project
@@ -2602,6 +2603,7 @@ social:
     - share
     - share-from-square
     - share-nodes
+    - square-bluesky
     - square-poll-horizontal
     - square-poll-vertical
     - square-share-nodes
