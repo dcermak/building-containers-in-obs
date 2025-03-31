@@ -39,6 +39,12 @@ html.reveal-full-page {
 	--r-overlay-gap: 5px;
 }
 
+@media screen and (max-width: 1024px), (max-height: 768px) {
+	.reveal-viewport {
+		--r-overlay-header-height: 26px;
+	}
+}
+
 // Force the presentation to cover the full viewport when we
 // enter fullscreen mode. Fixes sizing issues in Safari.
 .reveal-viewport:fullscreen {
@@ -1444,7 +1450,8 @@ $controlsArrowAngleActive: 36deg;
 }
 
 .reveal [data-preview-image],
-.reveal [data-preview-video] {
+.reveal [data-preview-video],
+.reveal [data-preview-link]:not(a):not([data-preview-link=false]) {
 	cursor: zoom-in;
 }
 
@@ -1455,7 +1462,7 @@ $controlsArrowAngleActive: 36deg;
 	bottom: var(--r-overlay-margin);
 	left: var(--r-overlay-margin);
 	border-radius: min( var(--r-overlay-margin), 6px );
-	z-index: 1000;
+	z-index: 99;
 	background: rgba( 0, 0, 0, 0.95 );
 	backdrop-filter: blur( 10px );
 	transition: all 0.3s ease;
@@ -1491,7 +1498,7 @@ $controlsArrowAngleActive: 36deg;
 	justify-content: center;
 	min-width: var(--r-overlay-header-height);
 	min-height: var(--r-overlay-header-height);
-	padding: 0 10px;
+	padding: 0 calc(var(--r-overlay-header-height) / 4);
 	opacity: 1;
 	border-radius: 6px;
 	font-size: 18px;
