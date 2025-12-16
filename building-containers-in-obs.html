@@ -39,8 +39,8 @@
 CC BY 4.0 <i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></a></p></div>
 </section>
 <section>
-<section id="slide-orgfb76bc2">
-<h2 id="orgfb76bc2">who -u</h2>
+<section id="slide-orgf906b0f">
+<h2 id="orgf906b0f">who -u</h2>
 <p>
 Dan Čermák
 </p>
@@ -62,21 +62,21 @@ Dan Čermák
 </section>
 </section>
 <section>
-<section id="slide-org21a26c3">
-<h2 id="org21a26c3">Agenda</h2>
+<section id="slide-orgf4972c1">
+<h2 id="orgf4972c1">Agenda</h2>
 <ul>
-<li><a href="#/slide-org71b6478">So you want to build containers?</a></li>
-<li><a href="#/slide-orgea84c5b">Everything 🤞 that you need to know</a></li>
-<li><a href="#/slide-orga5eee0d">"Everything" that you did not want to know</a></li>
-<li><a href="#/slide-org4f33469">Demo!</a></li>
-<li><a href="#/slide-orgf4a4bdb">Questions?</a></li>
+<li><a href="#/slide-org675b017">So you want to build containers?</a></li>
+<li><a href="#/slide-org1ade67f">Everything 🤞 that you need to know</a></li>
+<li><a href="#/slide-org10f5f3e">"Everything" that you did not want to know</a></li>
+<li><a href="#/slide-org4b85e58">Demo!</a></li>
+<li><a href="#/slide-org3e0ded7">Questions?</a></li>
 
 </ul>
 </section>
 </section>
 <section>
-<section id="slide-org71b6478">
-<h2 id="org71b6478">So you want to build containers?</h2>
+<section id="slide-org675b017">
+<h2 id="org675b017">So you want to build containers?</h2>
 <p>
 Why use OBS?
 </p>
@@ -91,16 +91,16 @@ Why use OBS?
 </section>
 </section>
 <section>
-<section id="slide-org50f3697">
-<h2 id="org50f3697">Available Tools</h2>
+<section id="slide-orgc010741">
+<h2 id="orgc010741">Available Tools</h2>
 <ol>
 <li class="fragment appear">Docker &amp; Podman/Buildah</li>
 <li class="fragment appear"><a href="https://github.com/OSInside/kiwi">Kiwi</a></li>
 
 </ol>
 </section>
-<section id="slide-orgaee3b1a">
-<h3 id="orgaee3b1a">When to use which?</h3>
+<section id="slide-org9bfc2d1">
+<h3 id="org9bfc2d1">When to use which?</h3>
 <ul>
 <li class="fragment appear">whatever you are familiar with</li>
 <li class="fragment appear">🤔 undecided? &rarr; <code>docker</code> / <code>podman</code></li>
@@ -108,8 +108,8 @@ Why use OBS?
 
 </ul>
 </section>
-<section id="slide-orgdee5d5b">
-<h3 id="orgdee5d5b">When not to use OBS</h3>
+<section id="slide-orgc1b54f7">
+<h3 id="orgc1b54f7">When not to use OBS</h3>
 <ul>
 <li class="fragment appear">not using <code>zypper</code>, <code>dnf</code> or <code>apt</code></li>
 <li class="fragment appear">complex <code>Dockerfile</code>, <code>curl</code>-ing from the www</li>
@@ -120,13 +120,13 @@ Why use OBS?
 </section>
 </section>
 <section>
-<section id="slide-orgea84c5b">
-<h2 id="orgea84c5b">Minimal Docker Example</h2>
-<div class="outline-text-2" id="text-orgea84c5b">
+<section id="slide-org1ade67f">
+<h2 id="org1ade67f">Minimal Docker Example</h2>
+<div class="outline-text-2" id="text-org1ade67f">
 </div>
 </section>
-<section id="slide-org7a9a773">
-<h3 id="org7a9a773">Repository Setup</h3>
+<section id="slide-org7c34446">
+<h3 id="org7c34446">Repository Setup</h3>
 <p>
 from <a href="https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta"><code>devel:BCI:Tumbleweed</code></a>:
 </p>
@@ -158,7 +158,7 @@ from <a href="https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta"><co
 </div>
 
 </section>
-<section id="slide-org7a9a773-split">
+<section id="slide-org7c34446-split">
 <p>
 based on <a href="https://build.opensuse.org/project/show/openSUSE:Templates:Images:Tumbleweed"><code>openSUSE:Templates:Images:Tumbleweed</code></a>:
 </p>
@@ -183,8 +183,8 @@ based on <a href="https://build.opensuse.org/project/show/openSUSE:Templates:Ima
 </code></pre>
 </div>
 </section>
-<section id="slide-org9324d5d">
-<h3 id="org9324d5d"><code>prjconf</code></h3>
+<section id="slide-org2f278d8">
+<h3 id="org2f278d8"><code>prjconf</code></h3>
 <pre  class="example" >
 %if %_repository == "containerfile"
 Type: docker
@@ -193,8 +193,8 @@ BuildEngine: podman
 %endif
 </pre>
 </section>
-<section id="slide-org2238e06">
-<h3 id="org2238e06"><code>Dockerfile</code></h3>
+<section id="slide-org9cec17e">
+<h3 id="org9cec17e"><code>Dockerfile</code></h3>
 <aside class="notes">
 <ul>
 <li>no full url in <code>FROM</code> &rArr; use build tag</li>
@@ -212,8 +212,8 @@ CMD ["/usr/bin/git"]
 </code></pre>
 </div>
 </section>
-<section id="slide-orgb9dc849">
-<h3 id="orgb9dc849"><code>Dockerfile</code> peculiarities</h3>
+<section id="slide-org3290ff0">
+<h3 id="org3290ff0"><code>Dockerfile</code> peculiarities</h3>
 <ul>
 <li class="fragment appear"><b>no</b> network access</li>
 <li class="fragment appear">all layers squashed</li>
@@ -225,8 +225,8 @@ CMD ["/usr/bin/git"]
 </section>
 </section>
 <section>
-<section id="slide-orgb0add32">
-<h2 id="orgb0add32">Kiwi example</h2>
+<section id="slide-orgfe71521">
+<h2 id="orgfe71521">Kiwi example</h2>
 <aside class="notes">
 <ul>
 <li><code>from</code> line: <code>#</code> instead of <code>:</code>, <code>obsrepositories</code> takes container from repos</li>
@@ -257,8 +257,8 @@ CMD ["/usr/bin/git"]
 </code></pre>
 </div>
 </section>
-<section id="slide-orgcc9e105">
-<h3 id="orgcc9e105">Repository setup</h3>
+<section id="slide-org48f37ee">
+<h3 id="org48f37ee">Repository setup</h3>
 <p>
 based on <a href="https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta"><code>devel:BCI:Tumbleweed</code></a>:
 </p>
@@ -288,7 +288,7 @@ based on <a href="https://build.opensuse.org/projects/devel:BCI:Tumbleweed/meta"
 </div>
 
 </section>
-<section id="slide-orgcc9e105-split">
+<section id="slide-org48f37ee-split">
 <p>
 based on <a href="https://build.opensuse.org/project/show/openSUSE:Templates:Images:Tumbleweed"><code>openSUSE:Templates:Images:Tumbleweed</code></a>:
 </p>
@@ -313,8 +313,8 @@ based on <a href="https://build.opensuse.org/project/show/openSUSE:Templates:Ima
 </code></pre>
 </div>
 </section>
-<section id="slide-org3fe3b41">
-<h3 id="org3fe3b41"><code>prjconf</code></h3>
+<section id="slide-org9119ace">
+<h3 id="org9119ace"><code>prjconf</code></h3>
 <pre  class="example" >
 %if "%_repository" == "images"
 Type: kiwi
@@ -325,8 +325,8 @@ Patterntype: none
 </section>
 </section>
 <section>
-<section id="slide-org1026b21">
-<h2 id="org1026b21">Registry Frontend</h2>
+<section id="slide-org1542a90">
+<h2 id="org1542a90">Registry Frontend</h2>
 <p class="fragment (appear)">
  <img src="./media/openSUSE_Registry.png" height="400px"/>
 </p>
@@ -337,8 +337,8 @@ registry.opensuse.org/ + <code>${prj_name/:/\/}.lower()</code> + <code>/$REPO/$B
 </section>
 </section>
 <section>
-<section id="slide-org74983be">
-<h2 id="org74983be">Tagging Images</h2>
+<section id="slide-orga5fa03c">
+<h2 id="orga5fa03c">Tagging Images</h2>
 <div class="org-src-container">
 
 <pre   ><code class="bash" >docker build -t my/prefix:1.5 -t my/prefix:latest .
@@ -373,8 +373,8 @@ kiwi xml:
 </section>
 </section>
 <section>
-<section id="slide-org1edab2a">
-<h2 id="org1edab2a">Local Testing</h2>
+<section id="slide-orgcc31bd6">
+<h2 id="orgcc31bd6">Local Testing</h2>
 <div class="org-src-container">
 
 <pre   ><code class="bash" data-line-numbers='1|1-4|6|6-12|10-12|14'>❯ osc build --clean images
@@ -396,8 +396,8 @@ Loaded image: docker.io/opensuse/registry:latest
 </section>
 </section>
 <section>
-<section id="slide-orga5eee0d">
-<h2 id="orga5eee0d">Multi-Arch</h2>
+<section id="slide-org10f5f3e">
+<h2 id="org10f5f3e">Multi-Arch</h2>
 <ul>
 <li data-fragment-index="1" class="fragment appear">one <code>Dockerfile</code> for <b>all</b> architectures</li>
 <li data-fragment-index="2" class="fragment appear">exclude/build only on architectures:</li>
@@ -435,8 +435,8 @@ RUN [ $(uname -m) = "x86_64" ] || zypper -n in non-amd64-pkg
 </section>
 </section>
 <section>
-<section id="slide-org8cfd4f9">
-<h2 id="org8cfd4f9">Building against a Registry</h2>
+<section id="slide-orga5980e7">
+<h2 id="orga5980e7">Building against a Registry</h2>
 <ul class="fragment appear">
 <li>create the registry as a <code>dod</code> project/repository (e.g. <a href="https://build.opensuse.org/project/show/SUSE:Registry"><code>SUSE:Registry</code></a>):</li>
 
@@ -457,7 +457,7 @@ RUN [ $(uname -m) = "x86_64" ] || zypper -n in non-amd64-pkg
 </div>
 
 </section>
-<section id="slide-org8cfd4f9-split">
+<section id="slide-orga5980e7-split">
 <ul>
 <li>Add it to your project <code>_meta</code>:</li>
 
@@ -477,8 +477,8 @@ RUN [ $(uname -m) = "x86_64" ] || zypper -n in non-amd64-pkg
 </code></pre>
 </div>
 </section>
-<section id="slide-orgb7554f9">
-<h3 id="orgb7554f9"><code>have choice for</code></h3>
+<section id="slide-org9049c6a">
+<h3 id="org9049c6a"><code>have choice for</code></h3>
 <div class="org-src-container">
 
 <pre  class="fragment appear" data-fragment-index="1"  ><code class="bash" >❯ osc buildinfo -d $prj $pkg containers x86_64|grep container
@@ -498,8 +498,8 @@ Prefer: -container:bci-openjdk-11
 </section>
 </section>
 <section>
-<section id="slide-org6691e55">
-<h2 id="org6691e55">Helper services</h2>
+<section id="slide-org8dea5a8">
+<h2 id="org8dea5a8">Helper services</h2>
 <div class="org-src-container">
 
 <pre  class="fragment (appear)" data-fragment-index="1"  ><code class="Dockerfile" >RUN curl -f https://path/to/binary.tar.gz -o binary.tar.gz
@@ -531,8 +531,8 @@ or
 </section>
 </section>
 <section>
-<section id="slide-orgc20fb7b">
-<h2 id="orgc20fb7b"><code>replace_using_package_version</code></h2>
+<section id="slide-org81bea8c">
+<h2 id="org81bea8c"><code>replace_using_package_version</code></h2>
 <p data-fragment-index="1" class="fragment (appear)">
 tag &amp; set env vars from package versions
 </p>
@@ -563,8 +563,8 @@ source:  <i class="fa-brands fa-github"></i> <a href="https://github.com/openSUS
 </section>
 </section>
 <section>
-<section id="slide-org9cd16df">
-<h2 id="org9cd16df"><code>metainfo_helper</code></h2>
+<section id="slide-org98e6f30">
+<h2 id="org98e6f30"><code>metainfo_helper</code></h2>
 <ul>
 <li data-fragment-index="1" class="fragment appear">source: <a href="https://build.opensuse.org/package/view_file/openSUSE:Tools/obs-service-kiwi_metainfo_helper/README?expand=1"><code>kiwi_metainfo_helper</code></a></li>
 <li data-fragment-index="2" class="fragment appear"><code>%RELEASE%</code> &rArr; <code>&lt;cicnt\&gt;.&lt;bldcnt\&gt;</code></li>
@@ -585,8 +585,8 @@ LABEL org.openbuildservice.disturl="%DISTURL%"
 </section>
 </section>
 <section>
-<section id="slide-org2533fca">
-<h2 id="org2533fca"><code>replace_using_env</code></h2>
+<section id="slide-orgb41571d">
+<h2 id="orgb41571d"><code>replace_using_env</code></h2>
 <ul>
 <li data-fragment-index="1" class="fragment appear">replaces <code>%%VARNAME%%</code> with <code>$VARNAME</code> from the build environment</li>
 <li data-fragment-index="2" class="fragment appear">can run scripts before the build (&rarr; to set the <code>env</code>)</li>
@@ -620,8 +620,8 @@ ENV KUBEVIRT_VERSION=%%PKG_VERSION%%
 </section>
 </section>
 <section>
-<section id="slide-org1dd3d3a">
-<h2 id="org1dd3d3a">Labels</h2>
+<section id="slide-org6ec610f">
+<h2 id="org6ec610f">Labels</h2>
 <ul>
 <li class="fragment appear">key-value metadata for a container image</li>
 <li class="fragment appear">pre-defined keys: <a href="https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys"><code>org.opencontainers.image.**</code></a></li>
@@ -632,7 +632,7 @@ ENV KUBEVIRT_VERSION=%%PKG_VERSION%%
 
 
 </section>
-<section id="slide-org1dd3d3a-split">
+<section id="slide-org6ec610f-split">
 
 <p data-fragment-index="1" class="fragment (appear)">
 preserve <code>LABEL</code> them using <a href="https://build.opensuse.org/package/view_file/openSUSE:Factory/obs-service-kiwi_label_helper/README?expand=1" data-fragment-index="1" class="fragment (appear)"><code>kiwi_label_helper</code></a>:
@@ -674,8 +674,8 @@ expands to:
 </section>
 </section>
 <section>
-<section id="slide-org58c9cb7">
-<h2 id="org58c9cb7">Build Arguments</h2>
+<section id="slide-orgaf606ca">
+<h2 id="orgaf606ca">Build Arguments</h2>
 <div class="org-src-container">
 
 <pre  class="fragment (appear)" data-fragment-index="1"  ><code class="Dockerfile" >ARG VERSION
@@ -701,8 +701,8 @@ docker build --build-arg="VERSION=1.4.2" .
 </section>
 </section>
 <section>
-<section id="slide-orgd94a384">
-<h2 id="orgd94a384">Even more 🧙🪄?</h2>
+<section id="slide-orgff8e752">
+<h2 id="orgff8e752">Even more 🧙🪄?</h2>
 <aside class="notes">
 <p>
 <a href="https://github.com/openSUSE/obs-build/issues/562">https://github.com/openSUSE/obs-build/issues/562</a>
@@ -724,14 +724,14 @@ ExpandFlags: kiwi-nobasepackages
 </section>
 </section>
 <section>
-<section id="slide-org84737c5">
-<h2 id="org84737c5">Keeping multiple versions around</h2>
+<section id="slide-orgb1fb081">
+<h2 id="orgb1fb081">Keeping multiple versions around</h2>
 <p>
  <img src="./media/persist_releases.svg"/>
 </p>
 
 </section>
-<section id="slide-org84737c5-split">
+<section id="slide-orgb1fb081-split">
 
 <p>
 rebuild repository:
@@ -751,7 +751,7 @@ rebuild repository:
 </div>
 
 </section>
-<section id="slide-org84737c5-split">
+<section id="slide-orgb1fb081-split">
 
 <p>
 release repository:
@@ -772,7 +772,7 @@ release repository:
 </div>
 
 </section>
-<section id="slide-org84737c5-split">
+<section id="slide-orgb1fb081-split">
 <aside class="notes">
 <ul>
 <li>beware, publishing can take ages, check <code>osc api /build//:Release/_result</code></li>
@@ -791,8 +791,8 @@ release:
 </section>
 </section>
 <section>
-<section id="slide-orgfaa3329">
-<h2 id="orgfaa3329">What else is there?</h2>
+<section id="slide-org61a77c3">
+<h2 id="org61a77c3">What else is there?</h2>
 <ul>
 <li class="fragment appear"><a href="https://opensuse.github.io/obs-build/pbuild.html#_remote_assets"><code>pbuild</code></a></li>
 <li class="fragment appear"><a href="https://openbuildservice.org/help/manuals/obs-user-guide/cha.obs.scm_ci_workflow_integration.html">SCM CI integration</a></li>
@@ -802,16 +802,16 @@ release:
 </section>
 </section>
 <section>
-<section id="slide-org4f33469">
-<h2 id="org4f33469">Demo!</h2>
+<section id="slide-org4b85e58">
+<h2 id="org4b85e58">Demo!</h2>
 <p class="fragment (appear)">
 What would you like to see?
 </p>
 </section>
 </section>
 <section>
-<section id="slide-orgf4a4bdb">
-<h2 id="orgf4a4bdb">Questions?</h2>
+<section id="slide-org3e0ded7">
+<h2 id="org3e0ded7">Questions?</h2>
 <p class="fragment (appear)">
 Answers!
 </p>
