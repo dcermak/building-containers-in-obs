@@ -8,6 +8,6 @@
   integrity sha512-3DguDv/oUE+7vjMeTSOjCSG+KeawgVQOHrKRnvUuqYh1mfArrh7s+s8hXW3e4RerBA1+Wh+hBqf8sJNpqNrBWg==
 
 reveal.js@^6.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/reveal.js/-/reveal.js-6.0.0.tgz#e25f68e08510084be446dd2750c13a89619a3f9a"
-  integrity sha512-RayDr1FL3Jglnf6p9xHGJ0U18va96PiuLs/JHnd1cdDOXvC+3lsXKe6ujl7PX0pvnhNW2Tpqnr6PEKpJVO2exw==
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/reveal.js/-/reveal.js-6.0.1.tgz#009b1bc7f063aaf721636eb0a5424ff924e0ef25"
+  integrity sha512-9eacArNIgqO2HGWOK+93gJNn+gvdGDVbSq+i2u3Ja9kjiHps0XNLpgYTZTYjKRH91uXy3clGimeGiw4umHG/tg==
