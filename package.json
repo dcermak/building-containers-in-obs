@@ -5,7 +5,7 @@
   "author": "Dan Čermák <dcermak@suse.com>",
   "license": "CC-BY-SA-4.0",
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^7.2",
+    "@fortawesome/fontawesome-free": "^7.3",
     "reveal.js": "^6.0"
   }
 }
